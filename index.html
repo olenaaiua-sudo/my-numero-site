@@ -3,64 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Матриця Долі | Онлайн-розрахунок</title>
+<title>Матриця Долі — Тест</title>
 <style>
     body {
-        font-family: 'Segoe UI', sans-serif;
-        color: white;
-        background: radial-gradient(circle at center, #1b0033, #000011);
+        font-family: Arial, sans-serif;
+        background: #f9f9f9;
+        color: #333;
         text-align: center;
+        margin: 0;
+        padding: 0;
     }
-    header { padding: 30px 20px; }
-    header h1 {
-        font-size: 2.5em;
-        background: linear-gradient(90deg, #ff6ec4, #7873f5);
-        -webkit-background-clip: text;
-        color: transparent;
+    header {
+        padding: 20px;
     }
-    input, button {
-        padding: 10px;
+    input {
+        padding: 8px;
         font-size: 1em;
-        margin: 5px;
-        border-radius: 5px;
-        border: none;
-    }
-    .btn {
-        background: linear-gradient(90deg, #ff6ec4, #7873f5);
-        color: white;
-        cursor: pointer;
+        margin-top: 10px;
     }
     canvas {
-        margin-top: 20px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 10px;
-    }
-    /* Модальне вікно */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 10;
-        left: 0; top: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.7);
-        justify-content: center;
-        align-items: center;
-    }
-    .modal-content {
-        background: #1b0033;
-        padding: 20px;
-        border-radius: 10px;
-        width: 90%;
-        max-width: 400px;
-        text-align: center;
-        border: 2px solid #ff6ec4;
-    }
-    .modal-content input {
-        width: 90%;
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 5px;
-        border: none;
+        background: #fff;
+        border: 1px solid #ccc;
+        max-width: 100%;
+        height: auto;
     }
 </style>
 </head>
@@ -68,127 +33,164 @@
 
 <header>
     <h1>Матриця Долі</h1>
-    <p>Введіть дату народження, щоб побудувати матрицю</p>
+    <p>Введіть дату народження:</p>
+    <input type="date" id="birthdate" onchange="updateMatrix()">
 </header>
 
-<section>
-    <input type="date" id="birthdate">
-    <button class="btn" onclick="drawFullMatrix()">Побудувати</button>
-    <br>
-    <canvas id="matrixCanvas" width="600" height="600"></canvas>
-    <br>
-    <button id="payBtn" class="btn" style="display:none" onclick="openModal()">Отримати розшифровку</button>
-</section>
-
-<!-- Модальне вікно -->
-<div id="paymentModal" class="modal">
-    <div class="modal-content">
-        <h2>Повна розшифровка</h2>
-        <p>Вартість: <b>999 грн</b><br>
-        PDF на e-mail за <b>3–5 робочих днів</b>.</p>
-        <input type="text" id="surname" placeholder="Прізвище" required>
-        <input type="text" id="name" placeholder="Ім’я" required>
-        <input type="email" id="email" placeholder="E-mail" required>
-        <input type="tel" id="phone" placeholder="Телефон" required>
-        <button class="btn" onclick="sendData()">Оплатити зараз</button>
-        <button onclick="closeModal()">Закрити</button>
-    </div>
-</div>
+<canvas id="matrixCanvas" width="600" height="600"></canvas>
 
 <script>
-// Твій робочий SCRIPT_URL
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEhFWbOWcCalbwdm8z1dOCMDxNGL8obwfnpMu258pf51ZJk_cwun0fnnLyqYONlqtlsg/exec";
+const canvas = document.getElementById("matrixCanvas");
+const ctx = canvas.getContext("2d");
 
-// Monobank банка
-const PAYMENT_URL = "https://send.monobank.ua/jar/7JHH34bgCD";
+const points = {
+    A: {}, A1: {}, A2: {},
+    B: {}, B1: {}, B2: {},
+    V: {}, V1: {}, V2: {},
+    G: {}, G1: {}, G2: {},
+    D: {},
+    E: {}, E1: {}, E2: {},
+    Zh: {}, Zh1: {}, Zh2: {},
+    Z: {}, Z1: {}, Z2: {},
+    I: {}, I1: {}, I2: {},
+    O: {}, M: {}, N: {}
+};
 
-function reduceToOneDigit(num) {
-    while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
-        num = num.toString().split('').map(Number).reduce((a,b) => a+b, 0);
-    }
-    return num;
+function resizeCanvas() {
+    const size = Math.min(window.innerWidth * 0.9, 600);
+    canvas.width = size;
+    canvas.height = size;
+    drawMatrix();
 }
+window.addEventListener('resize', resizeCanvas);
 
-function drawFullMatrix() {
-    let date = document.getElementById('birthdate').value;
-    if (!date) { alert("Введіть дату народження"); return; }
-
-    let nums = date.replace(/-/g, '').split('').map(Number);
-    let sum = nums.reduce((a,b) => a+b, 0);
-    let lifePath = reduceToOneDigit(sum);
-    let soul = reduceToOneDigit(nums[0] + nums[1]);
-    let month = reduceToOneDigit(nums[2] + nums[3]);
-    let destiny = reduceToOneDigit(nums[4] + nums[5] + nums[6] + nums[7]);
-
-    let points = [
-        {x: 300, y: 300, num: lifePath},
-        {x: 300, y: 100, num: soul},
-        {x: 300, y: 500, num: destiny},
-        {x: 100, y: 300, num: month},
-        {x: 500, y: 300, num: sum}
-    ];
-
-    let c = document.getElementById('matrixCanvas');
-    let ctx = c.getContext('2d');
-    ctx.clearRect(0, 0, c.width, c.height);
-
-    ctx.strokeStyle = "#ffffffaa";
-    ctx.lineWidth = 2;
+function drawCircle(x, y, r, color, text) {
     ctx.beginPath();
-    ctx.moveTo(points[1].x, points[1].y);
-    ctx.lineTo(points[0].x, points[0].y);
-    ctx.lineTo(points[2].x, points[2].y);
-    ctx.moveTo(points[3].x, points[3].y);
-    ctx.lineTo(points[0].x, points[0].y);
-    ctx.lineTo(points[4].x, points[4].y);
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1.5;
     ctx.stroke();
-
-    ctx.font = "20px Arial";
+    ctx.fillStyle = "#000";
+    ctx.font = `${r}px Arial`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    points.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 30, 0, Math.PI*2);
-        ctx.fillStyle = "rgba(255,255,255,0.1)";
-        ctx.fill();
-        ctx.strokeStyle = "#ff6ec4";
-        ctx.stroke();
-        ctx.fillStyle = "white";
-        ctx.fillText(p.num, p.x, p.y);
-    });
-
-    document.getElementById('payBtn').style.display = 'inline-block';
+    ctx.fillText(text, x, y);
 }
 
-function openModal() {
-    document.getElementById('paymentModal').style.display = 'flex';
-    let birthdate = document.getElementById('birthdate').value;
-    document.getElementById('paymentModal').setAttribute('data-birthdate', birthdate);
+function drawLine(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+    ctx.stroke();
 }
 
-function closeModal() {
-    document.getElementById('paymentModal').style.display = 'none';
+function drawMatrix() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const s = canvas.width / 600;
+
+    // Приблизні координати (потрібно буде відточити по шаблону)
+    points.A = {x: cx, y: cy - 200*s, r: 20*s, color: "#FFB6C1"};
+    points.A1 = {x: cx - 50*s, y: cy - 170*s, r: 15*s, color: "#FFD700"};
+    points.A2 = {x: cx + 50*s, y: cy - 170*s, r: 15*s, color: "#FFD700"};
+
+    points.B = {x: cx - 200*s, y: cy, r: 20*s, color: "#87CEFA"};
+    points.B1 = {x: cx - 170*s, y: cy - 50*s, r: 15*s, color: "#FFD700"};
+    points.B2 = {x: cx - 170*s, y: cy + 50*s, r: 15*s, color: "#FFD700"};
+
+    points.V = {x: cx, y: cy + 200*s, r: 20*s, color: "#90EE90"};
+    points.V1 = {x: cx - 50*s, y: cy + 170*s, r: 15*s, color: "#FFD700"};
+    points.V2 = {x: cx + 50*s, y: cy + 170*s, r: 15*s, color: "#FFD700"};
+
+    points.G = {x: cx + 200*s, y: cy, r: 20*s, color: "#FFA07A"};
+    points.G1 = {x: cx + 170*s, y: cy - 50*s, r: 15*s, color: "#FFD700"};
+    points.G2 = {x: cx + 170*s, y: cy + 50*s, r: 15*s, color: "#FFD700"};
+
+    points.D = {x: cx, y: cy, r: 25*s, color: "#BA55D3"};
+
+    points.E = {x: cx - 140*s, y: cy - 140*s, r: 18*s, color: "#ADD8E6"};
+    points.E1 = {x: cx - 100*s, y: cy - 100*s, r: 12*s, color: "#FFD700"};
+    points.E2 = {x: cx - 60*s, y: cy - 60*s, r: 12*s, color: "#FFD700"};
+
+    points.Zh = {x: cx + 140*s, y: cy - 140*s, r: 18*s, color: "#ADD8E6"};
+    points.Zh1 = {x: cx + 100*s, y: cy - 100*s, r: 12*s, color: "#FFD700"};
+    points.Zh2 = {x: cx + 60*s, y: cy - 60*s, r: 12*s, color: "#FFD700"};
+
+    points.Z = {x: cx - 140*s, y: cy + 140*s, r: 18*s, color: "#ADD8E6"};
+    points.Z1 = {x: cx - 100*s, y: cy + 100*s, r: 12*s, color: "#FFD700"};
+    points.Z2 = {x: cx - 60*s, y: cy + 60*s, r: 12*s, color: "#FFD700"};
+
+    points.I = {x: cx + 140*s, y: cy + 140*s, r: 18*s, color: "#ADD8E6"};
+    points.I1 = {x: cx + 100*s, y: cy + 100*s, r: 12*s, color: "#FFD700"};
+    points.I2 = {x: cx + 60*s, y: cy + 60*s, r: 12*s, color: "#FFD700"};
+
+    points.O = {x: cx, y: cy - 100*s, r: 14*s, color: "#FFDEAD"};
+    points.M = {x: cx - 100*s, y: cy, r: 14*s, color: "#FFDEAD"};
+    points.N = {x: cx, y: cy + 100*s, r: 14*s, color: "#FFDEAD"};
+
+    // Лінії (приклад основних)
+    drawLine(points.A.x, points.A.y, points.D.x, points.D.y);
+    drawLine(points.B.x, points.B.y, points.D.x, points.D.y);
+    drawLine(points.V.x, points.V.y, points.D.x, points.D.y);
+    drawLine(points.G.x, points.G.y, points.D.x, points.D.y);
+    drawLine(points.E.x, points.E.y, points.I.x, points.I.y);
+    drawLine(points.Zh.x, points.Zh.y, points.Z.x, points.Z.y);
+
+    // Малюємо точки
+    for (let key in points) {
+        drawCircle(points[key].x, points[key].y, points[key].r, points[key].color, points[key].value || "0");
+    }
 }
 
-function sendData() {
-    let data = {
-        surname: document.getElementById('surname').value,
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        birthdate: document.getElementById('paymentModal').getAttribute('data-birthdate')
-    };
+function calculatePointValues(date) {
+    // Тестові значення (рандом від 1 до 22)
+    for (let key in points) {
+        points[key].value = Math.floor(Math.random() * 22) + 1;
+    }
+}
 
-    if (!data.surname || !data.name || !data.email || !data.phone) {
-        alert("Заповніть всі поля");
-        return;
+function updateMatrix() {
+    const date = document.getElementById("birthdate").value;
+    if (!date) return;
+    calculatePointValues(date);
+    animateNumbers();
+}
+
+function animateNumbers() {
+    let step = 0;
+    const steps = 20;
+    const startValues = {};
+    const endValues = {};
+    for (let key in points) {
+        startValues[key] = 0;
+        endValues[key] = points[key].value;
     }
 
-    fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })
-    .then(res => res.json())
-    .then(() => { window.location.href = PAYMENT_URL; })
-    .catch(err => alert("Помилка відправки даних: " + err));
+    function frame() {
+        step++;
+        for (let key in points) {
+            const progress = step / steps;
+            points[key].currentValue = Math.floor(startValues[key] + (endValues[key] - startValues[key]) * progress);
+        }
+        drawMatrixWithAnimation();
+        if (step < steps) requestAnimationFrame(frame);
+    }
+    frame();
 }
+
+function drawMatrixWithAnimation() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let key in points) {
+        drawCircle(points[key].x, points[key].y, points[key].r, points[key].color, points[key].currentValue || "0");
+    }
+}
+
+resizeCanvas();
 </script>
 
 </body>
