@@ -10,21 +10,6 @@
         color: white;
         background: radial-gradient(circle at center, #1b0033, #000011);
         text-align: center;
-        overflow-x: hidden;
-    }
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0; left: 0;
-        width: 200%; height: 200%;
-        background: url('https://www.transparenttextures.com/patterns/stardust.png');
-        animation: moveStars 100s linear infinite;
-        z-index: -1;
-        opacity: 0.5;
-    }
-    @keyframes moveStars {
-        from {transform: translate(0,0);}
-        to {transform: translate(-500px,-500px);}
     }
     header { padding: 30px 20px; }
     header h1 {
@@ -33,43 +18,22 @@
         -webkit-background-clip: text;
         color: transparent;
     }
-    input[type="date"] {
+    input, button {
         padding: 10px;
         font-size: 1em;
+        margin: 5px;
         border-radius: 5px;
-        margin: 10px;
+        border: none;
     }
     .btn {
-        padding: 12px 25px;
-        font-size: 1em;
         background: linear-gradient(90deg, #ff6ec4, #7873f5);
-        border: none;
-        border-radius: 30px;
-        cursor: pointer;
         color: white;
-        margin-top: 10px;
+        cursor: pointer;
     }
     canvas {
         margin-top: 20px;
         background: rgba(255,255,255,0.05);
         border-radius: 10px;
-    }
-    /* Кнопка оплати */
-    #payBtn {
-        display: none;
-        margin-top: 20px;
-        padding: 15px 30px;
-        font-size: 1.2em;
-        background: linear-gradient(90deg, #ff6ec4, #7873f5);
-        border: none;
-        border-radius: 30px;
-        cursor: pointer;
-        color: white;
-        font-weight: bold;
-    }
-    #payBtn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 15px rgba(255,255,255,0.5);
     }
     /* Модальне вікно */
     .modal {
@@ -91,30 +55,12 @@
         text-align: center;
         border: 2px solid #ff6ec4;
     }
-    .modal-content h2 {
-        margin-bottom: 10px;
-        color: #ff6ec4;
-    }
-    .modal-content p {
-        font-size: 1em;
-        margin-bottom: 20px;
-    }
     .modal-content input {
         width: 90%;
         padding: 10px;
+        margin: 5px 0;
         border-radius: 5px;
         border: none;
-        margin-bottom: 15px;
-        font-size: 1em;
-    }
-    .modal-content button {
-        margin: 5px;
-        padding: 10px 20px;
-        border: none;
-        background: linear-gradient(90deg, #ff6ec4, #7873f5);
-        color: white;
-        border-radius: 5px;
-        cursor: pointer;
     }
 </style>
 </head>
@@ -122,7 +68,7 @@
 
 <header>
     <h1>Матриця Долі</h1>
-    <p>Введіть дату народження, щоб побудувати свою матрицю</p>
+    <p>Введіть дату народження, щоб побудувати матрицю</p>
 </header>
 
 <section>
@@ -131,7 +77,7 @@
     <br>
     <canvas id="matrixCanvas" width="600" height="600"></canvas>
     <br>
-    <button id="payBtn" onclick="openModal()">Отримати розшифровку</button>
+    <button id="payBtn" class="btn" style="display:none" onclick="openModal()">Отримати розшифровку</button>
 </section>
 
 <!-- Модальне вікно -->
@@ -139,16 +85,23 @@
     <div class="modal-content">
         <h2>Повна розшифровка</h2>
         <p>Вартість: <b>999 грн</b><br>
-        Після оплати на вказаний вами e-mail<br>
-        ви отримаєте детальний PDF з тлумаченням<br>
-        <b>на протязі 3–5 робочих днів</b>.</p>
-        <input type="email" id="clientEmail" placeholder="Введіть ваш e-mail" required>
-        <button onclick="goToPayment()">Оплатити зараз</button>
+        PDF на e-mail за <b>3–5 робочих днів</b>.</p>
+        <input type="text" id="surname" placeholder="Прізвище" required>
+        <input type="text" id="name" placeholder="Ім’я" required>
+        <input type="email" id="email" placeholder="E-mail" required>
+        <input type="tel" id="phone" placeholder="Телефон" required>
+        <button class="btn" onclick="sendData()">Оплатити зараз</button>
         <button onclick="closeModal()">Закрити</button>
     </div>
 </div>
 
 <script>
+// Твій робочий SCRIPT_URL
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEhFWbOWcCalbwdm8z1dOCMDxNGL8obwfnpMu258pf51ZJk_cwun0fnnLyqYONlqtlsg/exec";
+
+// Monobank банка
+const PAYMENT_URL = "https://send.monobank.ua/jar/7JHH34bgCD";
+
 function reduceToOneDigit(num) {
     while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
         num = num.toString().split('').map(Number).reduce((a,b) => a+b, 0);
@@ -162,7 +115,6 @@ function drawFullMatrix() {
 
     let nums = date.replace(/-/g, '').split('').map(Number);
     let sum = nums.reduce((a,b) => a+b, 0);
-
     let lifePath = reduceToOneDigit(sum);
     let soul = reduceToOneDigit(nums[0] + nums[1]);
     let month = reduceToOneDigit(nums[2] + nums[3]);
@@ -210,20 +162,32 @@ function drawFullMatrix() {
 
 function openModal() {
     document.getElementById('paymentModal').style.display = 'flex';
+    let birthdate = document.getElementById('birthdate').value;
+    document.getElementById('paymentModal').setAttribute('data-birthdate', birthdate);
 }
 
 function closeModal() {
     document.getElementById('paymentModal').style.display = 'none';
 }
 
-function goToPayment() {
-    let email = document.getElementById('clientEmail').value;
-    if (!email) {
-        alert("Будь ласка, введіть ваш e-mail");
+function sendData() {
+    let data = {
+        surname: document.getElementById('surname').value,
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        birthdate: document.getElementById('paymentModal').getAttribute('data-birthdate')
+    };
+
+    if (!data.surname || !data.name || !data.email || !data.phone) {
+        alert("Заповніть всі поля");
         return;
     }
-    // Тут можна додати збереження email в Google Sheets або на сервер
-    window.location.href = "https://your-payment-link.com";
+
+    fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })
+    .then(res => res.json())
+    .then(() => { window.location.href = PAYMENT_URL; })
+    .catch(err => alert("Помилка відправки даних: " + err));
 }
 </script>
 
