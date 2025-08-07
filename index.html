@@ -1,74 +1,183 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Матриця Долі</title>
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Матриця Долі — 1:1 шаблон</title>
+<style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f5fa;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+        font-family: Arial, sans-serif;
+        background: #f9f9f9;
+        color: #333;
+        text-align: center;
+        margin: 0;
+        padding: 0;
     }
     header {
-      padding: 2rem;
-      text-align: center;
+        padding: 20px;
     }
-    form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 2rem;
+    input {
+        padding: 8px;
+        font-size: 1em;
+        margin-top: 10px;
     }
-    input, button {
-      padding: 10px;
-      margin: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
+    canvas {
+        background: #fff;
+        border: 1px solid #ccc;
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
     }
-    button {
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-    }
-    svg {
-      max-width: 100%;
-      height: auto;
-    }
-  </style>
+</style>
 </head>
 <body>
-  <header>
+
+<header>
     <h1>Матриця Долі</h1>
-    <p>Введіть ваші дані, щоб побудувати матрицю</p>
-  </header>
+    <p>Введіть дату народження:</p>
+    <input type="date" id="birthdate" onchange="updateMatrix()">
+</header>
 
-  <form id="matrix-form">
-    <input type="text" id="surname" placeholder="Прізвище" required />
-    <input type="text" id="name" placeholder="Ім'я" required />
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="tel" id="phone" placeholder="Телефон" required />
-    <input type="date" id="birthdate" required />
-    <button type="submit">Розрахувати матрицю</button>
-  </form>
+<canvas id="matrixCanvas" width="800" height="800"></canvas>
+<script>
+const canvas = document.getElementById("matrixCanvas");
+const ctx = canvas.getContext("2d");
 
-  <div id="matrix-container">
-    <!-- SVG матриця буде вставлена тут -->
-  </div>
+const points = {
+    A: {}, A1: {}, A2: {},
+    B: {}, B1: {}, B2: {},
+    V: {}, V1: {}, V2: {},
+    G: {}, G1: {}, G2: {},
+    D: {},
+    E: {}, E1: {}, E2: {},
+    Zh: {}, Zh1: {}, Zh2: {},
+    Z: {}, Z1: {}, Z2: {},
+    I: {}, I1: {}, I2: {},
+    O: {}, M: {}, N: {}
+};
 
-  <script>
-    document.getElementById('matrix-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const birthdate = document.getElementById('birthdate').value;
-      // Тут буде логіка побудови матриці та відправки даних
-      alert('Матриця обчислюється. Наступний крок — побудова SVG.');
-    });
-  </script>
+// Функція для малювання кола з числом
+function drawCircle(x, y, r, color, text) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = "#000";
+    ctx.font = `${r}px Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, x, y);
+}
+
+// Функція для малювання лінії
+function drawLine(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+// Малювання символу
+function drawSymbol(x, y, symbol, size) {
+    ctx.fillStyle = "#000";
+    ctx.font = `${size}px Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(symbol, x, y);
+}
+
+// Розташування точок (координати під твоє зображення)
+function setPointsPositions() {
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+
+    // Приблизні координати — піджену під твою схему
+    points.A = {x: cx, y: cy - 300, r: 25, color: "#FFB6C1"};
+    points.A1 = {x: cx - 50, y: cy - 250, r: 18, color: "#FFD700"};
+    points.A2 = {x: cx + 50, y: cy - 250, r: 18, color: "#FFD700"};
+
+    points.B = {x: cx - 300, y: cy, r: 25, color: "#87CEFA"};
+    points.B1 = {x: cx - 250, y: cy - 50, r: 18, color: "#FFD700"};
+    points.B2 = {x: cx - 250, y: cy + 50, r: 18, color: "#FFD700"};
+
+    points.V = {x: cx, y: cy + 300, r: 25, color: "#90EE90"};
+    points.V1 = {x: cx - 50, y: cy + 250, r: 18, color: "#FFD700"};
+    points.V2 = {x: cx + 50, y: cy + 250, r: 18, color: "#FFD700"};
+
+    points.G = {x: cx + 300, y: cy, r: 25, color: "#FFA07A"};
+    points.G1 = {x: cx + 250, y: cy - 50, r: 18, color: "#FFD700"};
+    points.G2 = {x: cx + 250, y: cy + 50, r: 18, color: "#FFD700"};
+
+    points.D = {x: cx, y: cy, r: 30, color: "#BA55D3"};
+
+    points.E = {x: cx - 200, y: cy - 200, r: 20, color: "#ADD8E6"};
+    points.E1 = {x: cx - 150, y: cy - 150, r: 15, color: "#FFD700"};
+    points.E2 = {x: cx - 100, y: cy - 100, r: 15, color: "#FFD700"};
+
+    points.Zh = {x: cx + 200, y: cy - 200, r: 20, color: "#ADD8E6"};
+    points.Zh1 = {x: cx + 150, y: cy - 150, r: 15, color: "#FFD700"};
+    points.Zh2 = {x: cx + 100, y: cy - 100, r: 15, color: "#FFD700"};
+
+    points.Z = {x: cx - 200, y: cy + 200, r: 20, color: "#ADD8E6"};
+    points.Z1 = {x: cx - 150, y: cy + 150, r: 15, color: "#FFD700"};
+    points.Z2 = {x: cx - 100, y: cy + 100, r: 15, color: "#FFD700"};
+
+    points.I = {x: cx + 200, y: cy + 200, r: 20, color: "#ADD8E6"};
+    points.I1 = {x: cx + 150, y: cy + 150, r: 15, color: "#FFD700"};
+    points.I2 = {x: cx + 100, y: cy + 100, r: 15, color: "#FFD700"};
+
+    points.O = {x: cx, y: cy - 150, r: 14, color: "#FFDEAD"};
+    points.M = {x: cx - 150, y: cy, r: 14, color: "#FFDEAD"};
+    points.N = {x: cx, y: cy + 150, r: 14, color: "#FFDEAD"};
+}
+
+// Малювання всієї матриці
+function drawMatrix() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Лінії з'єднання (сюди можна додати всі як на шаблоні)
+    drawLine(points.A.x, points.A.y, points.D.x, points.D.y);
+    drawLine(points.B.x, points.B.y, points.D.x, points.D.y);
+    drawLine(points.V.x, points.V.y, points.D.x, points.D.y);
+    drawLine(points.G.x, points.G.y, points.D.x, points.D.y);
+    drawLine(points.E.x, points.E.y, points.I.x, points.I.y);
+    drawLine(points.Zh.x, points.Zh.y, points.Z.x, points.Z.y);
+
+    // Символи (приклади)
+    drawSymbol(points.O.x, points.O.y - 25, "❤", 20);
+    drawSymbol(points.M.x - 25, points.M.y, "$", 20);
+
+    // Малювання точок
+    for (let key in points) {
+        drawCircle(points[key].x, points[key].y, points[key].r, points[key].color, points[key].value || "0");
+    }
+}
+
+// Генерація тестових чисел
+function calculatePointValues(date) {
+    for (let key in points) {
+        points[key].value = Math.floor(Math.random() * 22) + 1;
+    }
+}
+
+// Оновлення при зміні дати
+function updateMatrix() {
+    const date = document.getElementById("birthdate").value;
+    if (!date) return;
+    calculatePointValues(date);
+    drawMatrix();
+}
+
+// Запуск
+setPointsPositions();
+calculatePointValues();
+drawMatrix();
+</script>
 </body>
 </html>
