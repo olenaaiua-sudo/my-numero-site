@@ -41,6 +41,20 @@
       max-width: 100%;
       height: auto;
     }
+    .point {
+      fill: #fff;
+      stroke: #333;
+      stroke-width: 1.5;
+    }
+    .label {
+      font-size: 14px;
+      fill: #000;
+      text-anchor: middle;
+    }
+    line {
+      stroke: #999;
+      stroke-width: 1;
+    }
   </style>
 </head>
 <body>
@@ -59,15 +73,28 @@
   </form>
 
   <div id="matrix-container">
-    <!-- SVG матриця буде вставлена тут -->
+    <svg id="matrix-svg" width="600" height="600" viewBox="0 0 600 600">
+      <!-- Шаблон SVG-сітки для матриці -->
+      <circle class="point" cx="300" cy="50" r="20" />
+      <text class="label" x="300" y="55">A</text>
+      <circle class="point" cx="150" cy="150" r="20" />
+      <text class="label" x="150" y="155">B</text>
+      <circle class="point" cx="450" cy="150" r="20" />
+      <text class="label" x="450" y="155">V</text>
+      <circle class="point" cx="300" cy="300" r="20" />
+      <text class="label" x="300" y="305">D</text>
+      <circle class="point" cx="300" cy="550" r="20" />
+      <text class="label" x="300" y="555">G</text>
+      <!-- Додамо більше точок і ліній при наступному кроці -->
+    </svg>
   </div>
 
   <script>
     document.getElementById('matrix-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const birthdate = document.getElementById('birthdate').value;
-      // Тут буде логіка побудови матриці та відправки даних
-      alert('Матриця обчислюється. Наступний крок — побудова SVG.');
+      // Далі реалізуємо логіку розрахунків і заповнення точок SVG
+      alert('Матриця обчислюється. Наступний крок — логіка та формули.');
     });
   </script>
 </body>
