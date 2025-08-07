@@ -1,101 +1,39 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Матриця Долі</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5fa;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    header {
-      padding: 2rem;
-      text-align: center;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-    input, button {
-      padding: 10px;
-      margin: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-    }
-    svg {
-      max-width: 100%;
-      height: auto;
-    }
-    .point {
-      fill: #fff;
-      stroke: #333;
-      stroke-width: 1.5;
-    }
-    .label {
-      font-size: 14px;
-      fill: #000;
-      text-anchor: middle;
-    }
-    line {
-      stroke: #999;
-      stroke-width: 1;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Матриця Долі</h1>
-    <p>Введіть ваші дані, щоб побудувати матрицю</p>
-  </header>
+<!-- [...попередній код залишається без змін до SVG...] -->
+<circle class="point" id="point-D" cx="300" cy="180" r="20" />
+<text class="label" x="300" y="185">Д</text>
 
-  <form id="matrix-form">
-    <input type="text" id="surname" placeholder="Прізвище" required />
-    <input type="text" id="name" placeholder="Ім'я" required />
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="tel" id="phone" placeholder="Телефон" required />
-    <input type="date" id="birthdate" required />
-    <button type="submit">Розрахувати матрицю</button>
-  </form>
+<circle class="point" id="point-E" cx="230" cy="240" r="20" />
+<text class="label" x="230" y="245">Е</text>
+<circle class="point" id="point-E1" cx="200" cy="280" r="20" />
+<text class="label" x="200" y="285">Е1</text>
+<circle class="point" id="point-E2" cx="170" cy="320" r="20" />
+<text class="label" x="170" y="325">Е2</text>
 
-  <div id="matrix-container">
-    <svg id="matrix-svg" width="600" height="600" viewBox="0 0 600 600">
-      <!-- Шаблон SVG-сітки для матриці -->
-      <circle class="point" cx="300" cy="50" r="20" />
-      <text class="label" x="300" y="55">A</text>
-      <circle class="point" cx="150" cy="150" r="20" />
-      <text class="label" x="150" y="155">B</text>
-      <circle class="point" cx="450" cy="150" r="20" />
-      <text class="label" x="450" y="155">V</text>
-      <circle class="point" cx="300" cy="300" r="20" />
-      <text class="label" x="300" y="305">D</text>
-      <circle class="point" cx="300" cy="550" r="20" />
-      <text class="label" x="300" y="555">G</text>
-      <!-- Додамо більше точок і ліній при наступному кроці -->
-    </svg>
-  </div>
+<circle class="point" id="point-ZH" cx="370" cy="240" r="20" />
+<text class="label" x="370" y="245">Ж</text>
+<circle class="point" id="point-ZH1" cx="400" cy="280" r="20" />
+<text class="label" x="400" y="285">Ж1</text>
+<circle class="point" id="point-ZH2" cx="430" cy="320" r="20" />
+<text class="label" x="430" y="325">Ж2</text>
 
-  <script>
-    document.getElementById('matrix-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const birthdate = document.getElementById('birthdate').value;
-      // Далі реалізуємо логіку розрахунків і заповнення точок SVG
-      alert('Матриця обчислюється. Наступний крок — логіка та формули.');
-    });
-  </script>
-</body>
-</html>
+<circle class="point" id="point-Z" cx="240" cy="370" r="20" />
+<text class="label" x="240" y="375">З</text>
+<circle class="point" id="point-Z1" cx="200" cy="400" r="20" />
+<text class="label" x="200" y="405">З1</text>
+<circle class="point" id="point-Z2" cx="160" cy="430" r="20" />
+<text class="label" x="160" y="435">З2</text>
+
+<circle class="point" id="point-I" cx="360" cy="370" r="20" />
+<text class="label" x="360" y="375">І</text>
+<circle class="point" id="point-I1" cx="400" cy="400" r="20" />
+<text class="label" x="400" y="405">І1</text>
+<circle class="point" id="point-I2" cx="440" cy="430" r="20" />
+<text class="label" x="440" y="435">І2</text>
+
+<circle class="point" id="point-O" cx="300" cy="440" r="20" />
+<text class="label" x="300" y="445">О</text>
+<circle class="point" id="point-M" cx="300" cy="480" r="20" />
+<text class="label" x="300" y="485">М</text>
+<circle class="point" id="point-N" cx="300" cy="520" r="20" />
+<text class="label" x="300" y="525">Н</text>
+<!-- [...залишається код закриття SVG і скриптів...] -->
